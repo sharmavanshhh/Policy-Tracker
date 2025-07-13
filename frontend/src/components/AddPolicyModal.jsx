@@ -195,7 +195,7 @@ const AddPolicyModal = ({ onClose, onAdded }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {[
                 { label: "Application Number", name: "applicationNumber", required: true },
-                { label: "Policy Number", name: "policyNumber" },
+                { label: "Policy Number", name: "policyNumber", type: "number" },
                 { label: "Customer Name", name: "customerName", required: true },
                 { label: "Advisor Name", name: "advisorName", required: true },
                 { label: "FYFRP", name: "fyfrp", type: "number" },
