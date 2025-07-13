@@ -26,7 +26,7 @@ function App() {
 
   const fetchPolicies = () => {
     axios
-      .get("http://localhost:5000/api/policies")
+      .get("https://policy-tracker-o1bg.onrender.com/api/policies")
       .then((res) => {
         setPolicies(res.data);
         setFiltered(res.data);
