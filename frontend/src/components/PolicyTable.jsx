@@ -70,7 +70,7 @@ const PolicyTable = ({ policies, onDelete, onEdit }) => {
 
       {/* Cards for mobile and tablet */}
       {!isDesktop && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-[90%] mx-auto mt-4">
           {sorted.map((p, idx) => (
             <div
               key={p.applicationNumber || idx}
