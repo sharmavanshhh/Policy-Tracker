@@ -174,6 +174,7 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
                     styles={customSelectStyles}
                     placeholder="Select Mode"
                     isSearchable={false}
+                    menuPlacement="auto"
                   />
                 </div>
 
@@ -193,6 +194,7 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
                     styles={customSelectStyles}
                     placeholder="Select Advisor"
                     isSearchable={false}
+                    menuPlacement="auto"
                   />
                 </div>
 
@@ -220,6 +222,7 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
                     styles={customSelectStyles}
                     placeholder="Select Month"
                     isSearchable={false}
+                    menuPlacement="auto"
                   />
                 </div>
               </div>
