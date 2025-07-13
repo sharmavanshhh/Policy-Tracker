@@ -14,6 +14,7 @@ const PinLogin = ({ onSubmit, resetTrigger }) => {
     }, [resetTrigger]);
 
 
+
     const handleChange = (index, value) => {
         if (!/^\d?$/.test(value)) return;
 
