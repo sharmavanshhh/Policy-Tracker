@@ -260,8 +260,14 @@ function App() {
         {showPinErrorModal && (
           <MessageModal
             title="Incorrect PIN"
-            message="Incorrect PIN. Please try again."
+            message="Please try again."
             onClose={() => setShowPinErrorModal(false)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setShowPinErrorModal(false);
+              }
+            }
+          }
           />
         )}
       </div>
