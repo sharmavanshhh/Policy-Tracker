@@ -85,7 +85,8 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
           <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 transition-opacity" />
         )}
 
-        {searchInput !== "" && (
+        {searchInput !== "" && filters.search === "" ? (
+          // Show arrow if typing but not yet submitted
           <button
             onClick={() => {
               handleSearch();
@@ -94,6 +95,19 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-crimson-700 hover:text-crimson-900 transition"
           >
             <FaArrowRight className="text-lg" />
+          </button>
+        ) : null}
+
+        {filters.search !== "" && (
+          // Show clear (X) button after search is applied
+          <button
+            onClick={() => {
+              setSearchInput("");
+              setFilters((prev) => ({ ...prev, search: "" }));
+            }}
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-red-600 transition"
+          >
+            <FaTimesCircle className="text-lg" />
           </button>
         )}
 
@@ -108,7 +122,7 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
             }
           }}
           placeholder="Search Customers"
-          className="w-full pl-10 pr-10 py-2 bg-neutral-100 text-gray-800 rounded-3xl focus:outline-none transition"
+          className={`w-full ${searchInput === "" ? "pl-10" : "pl-4"} pr-10 py-2 bg-neutral-100 text-gray-800 rounded-3xl focus:outline-none transition`}
         />
       </div>
 
@@ -187,11 +201,11 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
                     value={
                       tempFilters.month
                         ? {
-                            label: new Date(0, parseInt(tempFilters.month) - 1).toLocaleString("en-IN", {
-                              month: "short",
-                            }),
-                            value: tempFilters.month,
-                          }
+                          label: new Date(0, parseInt(tempFilters.month) - 1).toLocaleString("en-IN", {
+                            month: "short",
+                          }),
+                          value: tempFilters.month,
+                        }
                         : null
                     }
                     onChange={(option) =>
