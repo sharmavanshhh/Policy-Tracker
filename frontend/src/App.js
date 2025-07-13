@@ -22,6 +22,8 @@ function App() {
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [pinInput, setPinInput] = useState("");
   const [authenticated, setIsAuthenticated] = useState(false);
+  const [showPinErrorModal, setShowPinErrorModal] = useState(false);
+
 
 
   const fetchPolicies = () => {
@@ -41,12 +43,12 @@ function App() {
   const handlePinSubmit = (pin) => {
     if (pin === CORRECT_PIN) {
       setIsAuthenticated(true);
-      setViewMode("dashboard"); // <- Always go to dashboard on login
+      setViewMode("dashboard");
     } else {
-      alert("Incorrect PIN. Please try again.");
-      setPinInput("");
+      setShowPinErrorModal(true); // show modal
     }
   };
+
 
 
   const handleFilterChange = ({ mode, advisor, month, search }) => {
@@ -252,7 +254,14 @@ function App() {
   if (!authenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-200 via-silver to-gray-100">
-        <PinLogin onSubmit={handlePinSubmit} />
+        <PinLogin onSubmit={handlePinSubmit} resetTrigger={showPinErrorModal} />
+        {showPinErrorModal && (
+          <ConfirmModal
+            message="Incorrect PIN. Please try again."
+            onClose={() => setShowPinErrorModal(false)}
+            onConfirm={() => setShowPinErrorModal(false)}
+          />
+        )}
       </div>
     );
   }
