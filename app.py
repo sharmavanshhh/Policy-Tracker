@@ -27,11 +27,8 @@ collection = db[os.getenv("COLLECTION_NAME")]
 app = Flask(__name__)
 
 # Enable CORS for all origins with full header and credential support
-CORS(app,
-     origins="*",
-     allow_headers=["Content-Type", "Authorization"],
-     supports_credentials=True,
-     max_age=timedelta(days=1))
+CORS(app, resources={r"/*": {"origins": "*"}})
+
 
 # Health check route
 @app.route("/")
