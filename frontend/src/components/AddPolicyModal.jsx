@@ -112,7 +112,7 @@ const AddPolicyModal = ({ onClose, onAdded }) => {
       handleClose();
     } catch (err) {
       console.error(err);
-      if (err.response?.data?.error?.toLowerCase().includes("application number")) {
+      if (err.response?.data?.error?.toLowerCase().includes("application")) {
         setError("Application Number already exists. Please enter a unique one.");
       } else {
         setError("Failed to add policy. Please try again later.");
