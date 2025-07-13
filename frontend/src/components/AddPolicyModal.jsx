@@ -132,6 +132,7 @@ const AddPolicyModal = ({ onClose, onAdded }) => {
       paddingLeft: "0.5rem",
       paddingRight: "0.5rem",
       minHeight: "2.5rem",
+      outline: "none",
     }),
     dropdownIndicator: (base) => ({
       ...base,

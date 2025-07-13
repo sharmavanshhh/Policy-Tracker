@@ -130,6 +130,7 @@ const EditPolicyModal = ({ policy, onClose, onUpdated }) => {
       paddingLeft: "0.5rem",
       paddingRight: "0.5rem",
       minHeight: "2.5rem",
+      outline: "none",
     }),
     dropdownIndicator: (base) => ({
       ...base,
