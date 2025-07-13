@@ -109,7 +109,7 @@ const EditPolicyModal = ({ policy, onClose, onUpdated }) => {
 
     try {
       setLoading(true);
-      await axios.put(`http://policy-tracker-o1bg.onrender.com/api/policies/${form.applicationNumber}`, payload);
+      await axios.put(`https://policy-tracker-o1bg.onrender.com/api/policies/${form.applicationNumber}`, payload);
       onUpdated();
       handleClose();
     } catch (err) {
