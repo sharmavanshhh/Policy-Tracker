@@ -150,7 +150,7 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
                   onClick={() => setShowModal(false)}
                   className="text-gray-500 hover:text-crimson-800"
                 >
-                  <FaTimesCircle size={20} />
+                  <FaTimes size={20} />
                 </button>
               </div>
 
