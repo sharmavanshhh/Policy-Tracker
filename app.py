@@ -1,14 +1,11 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, abort
 from flask_cors import CORS
 from pymongo import MongoClient
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
 import urllib.parse
 from bson.objectid import ObjectId
-from bson import ObjectId
-from flask import abort
-
 
 # Load .env variables
 load_dotenv()
@@ -28,9 +25,15 @@ collection = db[os.getenv("COLLECTION_NAME")]
 
 # Flask app setup
 app = Flask(__name__)
-CORS(app, origins="*")  # Allow all origins for CORS
 
-# Health check
+# Enable CORS for all origins with full header and credential support
+CORS(app,
+     origins="*",
+     allow_headers=["Content-Type", "Authorization"],
+     supports_credentials=True,
+     max_age=timedelta(days=1))
+
+# Health check route
 @app.route("/")
 def home():
     return "Insurance Policy Tracker API running ✅"
@@ -38,6 +41,7 @@ def home():
 # Add a policy
 @app.route("/api/policies", methods=["POST"])
 def add_policy():
+    print(f"[POST] /api/policies from {request.remote_addr} - {request.user_agent}")
     data = request.json
     data["createdAt"] = datetime.utcnow()
     collection.insert_one(data)
@@ -46,9 +50,11 @@ def add_policy():
 # Get all policies
 @app.route("/api/policies", methods=["GET"])
 def get_policies():
-    policies = list(collection.find({}, {"_id": 0}))  # Hide MongoDB ID
+    print(f"[GET] /api/policies from {request.remote_addr} - {request.user_agent}")
+    policies = list(collection.find({}, {"_id": 0}))  # Hiding MongoDB ObjectId
     return jsonify(policies)
 
+# Delete a policy by application number
 @app.route("/api/policies/<application_number>", methods=["DELETE"])
 def delete_policy(application_number):
     result = collection.delete_one({"applicationNumber": application_number})
@@ -57,17 +63,18 @@ def delete_policy(application_number):
     else:
         return jsonify({"error": "Policy not found"}), 404
 
+# Update a policy by application number
 @app.route("/api/policies/<application_number>", methods=["PUT"])
 def update_policy(application_number):
     data = request.json
     result = collection.update_one(
-        { "applicationNumber": application_number },
-        { "$set": data }
+        {"applicationNumber": application_number},
+        {"$set": data}
     )
     if result.matched_count == 0:
         return jsonify({"error": "Policy not found"}), 404
-    return jsonify({"message": "Policy updated!"})
+    return jsonify({"message": "Policy updated!"}), 200
 
-
+# Local development only
 if __name__ == "__main__":
     app.run(debug=True)
