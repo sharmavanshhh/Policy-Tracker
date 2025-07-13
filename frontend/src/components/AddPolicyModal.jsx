@@ -107,7 +107,7 @@ const AddPolicyModal = ({ onClose, onAdded }) => {
 
     try {
       setLoading(true);
-      await axios.post("http://localhost:5000/api/policies", payload);
+      await axios.post("http://policy-tracker-o1bg.onrender.com/api/policies", payload);
       onAdded();
       handleClose();
     } catch (err) {
