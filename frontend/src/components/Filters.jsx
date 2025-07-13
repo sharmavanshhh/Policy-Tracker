@@ -92,7 +92,7 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
               handleSearch();
               document.activeElement?.blur();
             }}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-crimson-700 hover:text-crimson-900 transition"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-crimson-800 hover:text-crimson-800 transition"
           >
             <FaArrowRight className="text-lg" />
           </button>
@@ -105,7 +105,7 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
               setSearchInput("");
               setFilters((prev) => ({ ...prev, search: "" }));
             }}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-red-600 transition"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-crimson-800 hover:text-crimson-800 transition"
           >
             <FaTimesCircle className="text-lg" />
           </button>
@@ -148,7 +148,7 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
                 <h2 className="text-lg font-semibold text-gray-700">Filter Policies</h2>
                 <button
                   onClick={() => setShowModal(false)}
-                  className="text-gray-500 hover:text-red-500"
+                  className="text-crimson-800 hover:text-crimson-800"
                 >
                   <FaTimesCircle size={20} />
                 </button>
