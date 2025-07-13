@@ -28,7 +28,7 @@ collection = db[os.getenv("COLLECTION_NAME")]
 
 # Flask app setup
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins="*")  # Allow all origins for CORS
 
 # Health check
 @app.route("/")
