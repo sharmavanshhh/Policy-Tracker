@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
   FaFilter,
-  FaTimesCircle,
+  FaTimes,
   FaSearch,
   FaArrowRight,
 } from "react-icons/fa";
@@ -105,9 +105,9 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
               setSearchInput("");
               setFilters((prev) => ({ ...prev, search: "" }));
             }}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-crimson-800 hover:text-crimson-800 transition"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-crimson-800 transition"
           >
-            <FaTimesCircle className="text-lg" />
+            <FaTimes className="text-lg" />
           </button>
         )}
 
@@ -148,7 +148,7 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
                 <h2 className="text-lg font-semibold text-gray-700">Filter Policies</h2>
                 <button
                   onClick={() => setShowModal(false)}
-                  className="text-crimson-800 hover:text-crimson-800"
+                  className="text-gray-500 hover:text-crimson-800"
                 >
                   <FaTimesCircle size={20} />
                 </button>
