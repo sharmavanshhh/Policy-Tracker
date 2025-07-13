@@ -251,6 +251,7 @@ function App() {
     setViewMode("dashboard"); // Reset to dashboard on logout
   };
 
+  const activeFilterCount = Object.values(filters).filter((v) => v !== "").length;
 
   if (!authenticated) {
     return (
@@ -358,14 +359,24 @@ function App() {
             />
           </div>
 
-          {/* Floating Filter Button (Left) */}
-          <button
-            onClick={() => setShowFilterModal(true)}
-            className="fixed bottom-6 left-4 sm:bottom-8 sm:left-8 bg-gradient-to-r from-crimson-700 to-gray-800 text-white w-12 h-12 sm:w-14 sm:h-14 rounded-full shadow-xl flex items-center justify-center text-lg sm:text-xl transition"
-            title="Open Filters"
-          >
-            <FaFilter />
-          </button>
+          {/* Floating Filter Button with Active Badge */}
+          <div className="fixed bottom-6 left-4 sm:bottom-8 sm:left-8 z-50">
+            <button
+              onClick={() => setShowFilterModal(true)}
+              className="relative bg-gradient-to-r from-crimson-700 to-gray-800 text-white w-12 h-12 sm:w-14 sm:h-14 rounded-full shadow-xl flex items-center justify-center text-lg sm:text-xl transition"
+              title="Open Filters"
+            >
+              <FaFilter />
+
+              {/* Show badge only if any filters are active */}
+              {activeFilterCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow">
+                  {activeFilterCount > 9 ? "9+" : activeFilterCount}
+                </span>
+              )}
+            </button>
+          </div>
+
 
           {/* Floating Add Button (Right) */}
           <button
