@@ -173,6 +173,7 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
                     }))}
                     styles={customSelectStyles}
                     placeholder="Select Mode"
+                    isSearchable={false}
                   />
                 </div>
 
@@ -191,6 +192,7 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
                     options={advisors.map((name) => ({ value: name, label: name }))}
                     styles={customSelectStyles}
                     placeholder="Select Advisor"
+                    isSearchable={false}
                   />
                 </div>
 
@@ -217,6 +219,7 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
                     }))}
                     styles={customSelectStyles}
                     placeholder="Select Month"
+                    isSearchable={false}
                   />
                 </div>
               </div>
