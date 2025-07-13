@@ -252,8 +252,8 @@ function App() {
   };
 
 
-  {
-    !authenticated && (
+  if (!authenticated) {
+    return (
       <div className="h-screen w-screen fixed inset-0 flex items-center justify-center bg-gradient-to-br from-gray-200 via-silver to-gray-100">
         <PinLogin onSubmit={handlePinSubmit} resetTrigger={showPinErrorModal} />
         {showPinErrorModal && (
@@ -264,7 +264,7 @@ function App() {
           />
         )}
       </div>
-    )
+    );
   }
 
 
