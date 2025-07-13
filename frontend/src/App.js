@@ -7,7 +7,7 @@ import PolicyTable from "./components/PolicyTable";
 import Summary from "./components/Summary";
 import AddPolicyModal from "./components/AddPolicyModal";
 import MessageModal from "./components/MessageModal";
-import ConfirmModal from "./components/ConfirmModal";
+import EditPolicyModal from "./components/EditPolicyModal";
 import PinLogin from "./components/PinLogin";
 import { motion, AnimatePresence } from "framer-motion";
 
