@@ -51,6 +51,12 @@
   display: none !important;
 }
 
+/* This class visually masks numbers like passwords */
+.password-mask {
+  -webkit-text-security: disc; /* Safari/Chrome */
+}
+
+
 
 body {
   margin: 0;
