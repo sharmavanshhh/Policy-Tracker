@@ -38,7 +38,7 @@ const PolicyTable = ({ policies, onDelete, onEdit }) => {
   const handleDelete = async () => {
     try {
       await axios.delete(
-        `http://localhost:5000/api/policies/${String(deleteId)}`
+        `http://policy-tracker-o1bg.onrender.com/api/policies/${String(deleteId)}`
       );
       onDelete(deleteId);
       setConfirmOpen(false);
