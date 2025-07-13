@@ -78,7 +78,7 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
   };
 
   return (
-    <div className="relative w-[90%] max-w-lg mx-auto mb-6">
+    <div className="w-full sm:max-w-md sm:ml-0 sm:mr-auto mb-6">
       {/* Search Bar */}
       <div className="relative w-full">
         {searchInput === "" && (
@@ -86,7 +86,6 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
         )}
 
         {searchInput !== "" && filters.search === "" ? (
-          // Show arrow if typing but not yet submitted
           <button
             onClick={() => {
               handleSearch();
@@ -99,7 +98,6 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
         ) : null}
 
         {filters.search !== "" && (
-          // Show clear (X) button after search is applied
           <button
             onClick={() => {
               setSearchInput("");
