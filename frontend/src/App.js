@@ -6,7 +6,7 @@ import Filters from "./components/Filters";
 import PolicyTable from "./components/PolicyTable";
 import Summary from "./components/Summary";
 import AddPolicyModal from "./components/AddPolicyModal";
-import EditPolicyModal from "./components/EditPolicyModal";
+import MessageModal from "./components/MessageModal";
 import ConfirmModal from "./components/ConfirmModal";
 import PinLogin from "./components/PinLogin";
 import { motion, AnimatePresence } from "framer-motion";
@@ -252,20 +252,21 @@ function App() {
   };
 
 
-  if (!authenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-200 via-silver to-gray-100">
+  {
+    !authenticated && (
+      <div className="h-screen w-screen fixed inset-0 flex items-center justify-center bg-gradient-to-br from-gray-200 via-silver to-gray-100">
         <PinLogin onSubmit={handlePinSubmit} resetTrigger={showPinErrorModal} />
         {showPinErrorModal && (
-          <ConfirmModal
+          <MessageModal
+            title="Incorrect PIN"
             message="Incorrect PIN. Please try again."
             onClose={() => setShowPinErrorModal(false)}
-            onConfirm={() => setShowPinErrorModal(false)}
           />
         )}
       </div>
-    );
+    )
   }
+
 
 
   return (
