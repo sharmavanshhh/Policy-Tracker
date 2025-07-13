@@ -78,7 +78,7 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
   };
 
   return (
-    <div className="relative w-full sm:max-w-sm md:max-w-md lg:max-w-lg mb-6">
+    <div className="relative w-[80%] max-w-lg mx-auto mb-6">
       {/* Search Bar */}
       <div className="relative w-full">
         {searchInput === "" && (
