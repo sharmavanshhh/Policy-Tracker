@@ -140,12 +140,17 @@ const AddPolicyModal = ({ onClose, onAdded }) => {
       padding: "0 6px",
     }),
     indicatorSeparator: () => ({ display: "none" }),
-    menu: (base) => ({ ...base, zIndex: 9999, color: "#111827" }),
+    menu: (base) => ({
+      ...base,
+      zIndex: 9999,
+      color: "#111827",
+    }),
     option: (base, state) => ({
       ...base,
       backgroundColor: state.isFocused ? "#e5e7eb" : "#fff",
       color: "#111827",
       fontSize: "0.875rem",
+      cursor: "pointer",
     }),
     singleValue: (base) => ({ ...base, color: "#1f2937" }),
     placeholder: (base) => ({ ...base, color: "#1f2937" }),
