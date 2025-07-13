@@ -242,6 +242,7 @@ const AddPolicyModal = ({ onClose, onAdded }) => {
                   styles={customSelectStyles}
                   menuPlacement="auto"
                   placeholder="Select Mode"
+                  isSearchable={false}
                 />
               </div>
 
@@ -256,6 +257,7 @@ const AddPolicyModal = ({ onClose, onAdded }) => {
                   styles={customSelectStyles}
                   placeholder="Select Status"
                   menuPlacement="auto"
+                  isSearchable={false}
                 />
               </div>
 
