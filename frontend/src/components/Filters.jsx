@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { FaFilter, FaTimesCircle, FaSearch } from "react-icons/fa";
+import {
+  FaFilter,
+  FaTimesCircle,
+  FaSearch,
+  FaArrowRight,
+} from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import Select from "react-select";
 
@@ -12,6 +17,7 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
   });
 
   const [tempFilters, setTempFilters] = useState({ ...filters });
+  const [searchInput, setSearchInput] = useState("");
 
   const advisors = [...new Set(policies.map((p) => p.advisorName))].filter(Boolean);
 
@@ -30,12 +36,17 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
     const cleared = { mode: "", advisor: "", month: "", search: "" };
     setFilters(cleared);
     setTempFilters(cleared);
+    setSearchInput("");
     setShowModal(false);
   };
 
   const applyFilters = () => {
     setFilters(tempFilters);
     setShowModal(false);
+  };
+
+  const handleSearch = () => {
+    setFilters((prev) => ({ ...prev, search: searchInput }));
   };
 
   const customSelectStyles = {
@@ -67,23 +78,39 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
   };
 
   return (
-    <div className="relative w-full mb-12 px-4 sm:px-6 md:px-0">
-      {/* Search */}
-      <div className="flex justify-start mb-4">
-        <div className="relative w-full sm:max-w-sm md:max-w-md lg:max-w-lg">
-          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-          <input
-            type="text"
-            value={filters.search}
-            onChange={(e) =>
-              setFilters((prev) => ({ ...prev, search: e.target.value }))
-            }
-            placeholder="Search Customers"
-            className="w-full pl-10 pr-4 py-2 bg-neutral-100 text-gray-800 rounded-3xl focus:outline-none"
-          />
-        </div>
-      </div>
+    <div className="relative w-full sm:max-w-sm md:max-w-md lg:max-w-lg mb-6">
+      {/* Search Bar */}
+      <div className="relative w-full">
+        {searchInput === "" && (
+          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 transition-opacity" />
+        )}
 
+        {searchInput !== "" && (
+          <button
+            onClick={() => {
+              handleSearch();
+              document.activeElement?.blur();
+            }}
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-crimson-700 hover:text-crimson-900 transition"
+          >
+            <FaArrowRight className="text-lg" />
+          </button>
+        )}
+
+        <input
+          type="text"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSearch();
+              e.target.blur();
+            }
+          }}
+          placeholder="Search Customers"
+          className="w-full pl-10 pr-10 py-2 bg-neutral-100 text-gray-800 rounded-3xl focus:outline-none transition"
+        />
+      </div>
 
       {/* Modal */}
       <AnimatePresence>
@@ -118,8 +145,14 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
                 <div className="flex flex-col w-full">
                   <label className="text-sm font-medium text-gray-700 mb-1">Mode</label>
                   <Select
-                    value={tempFilters.mode ? { label: tempFilters.mode, value: tempFilters.mode } : null}
-                    onChange={(option) => handleTempChange("mode", option?.value || "")}
+                    value={
+                      tempFilters.mode
+                        ? { label: tempFilters.mode, value: tempFilters.mode }
+                        : null
+                    }
+                    onChange={(option) =>
+                      handleTempChange("mode", option?.value || "")
+                    }
                     options={["Yearly", "Half-Yearly", "Quarterly", "Monthly"].map((m) => ({
                       value: m,
                       label: m,
@@ -133,8 +166,14 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
                 <div className="flex flex-col w-full">
                   <label className="text-sm font-medium text-gray-700 mb-1">Advisor</label>
                   <Select
-                    value={tempFilters.advisor ? { label: tempFilters.advisor, value: tempFilters.advisor } : null}
-                    onChange={(option) => handleTempChange("advisor", option?.value || "")}
+                    value={
+                      tempFilters.advisor
+                        ? { label: tempFilters.advisor, value: tempFilters.advisor }
+                        : null
+                    }
+                    onChange={(option) =>
+                      handleTempChange("advisor", option?.value || "")
+                    }
                     options={advisors.map((name) => ({ value: name, label: name }))}
                     styles={customSelectStyles}
                     placeholder="Select Advisor"
@@ -148,14 +187,16 @@ const Filters = ({ policies, onFilterChange, showModal, setShowModal }) => {
                     value={
                       tempFilters.month
                         ? {
-                          label: new Date(0, parseInt(tempFilters.month) - 1).toLocaleString("en-IN", {
-                            month: "short",
-                          }),
-                          value: tempFilters.month,
-                        }
+                            label: new Date(0, parseInt(tempFilters.month) - 1).toLocaleString("en-IN", {
+                              month: "short",
+                            }),
+                            value: tempFilters.month,
+                          }
                         : null
                     }
-                    onChange={(option) => handleTempChange("month", option?.value || "")}
+                    onChange={(option) =>
+                      handleTempChange("month", option?.value || "")
+                    }
                     options={Array.from({ length: 12 }, (_, i) => ({
                       value: String(i + 1).padStart(2, "0"),
                       label: new Date(0, i).toLocaleString("en-IN", { month: "short" }),
