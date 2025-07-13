@@ -267,7 +267,7 @@ function App() {
             className="flex items-center gap-2 text-crimson-800 hover:text-crimson-900 font-medium text-sm sm:text-base transition"
             title="Logout"
           >
-            <FaSignOutAlt className="text-base sm:text-lg" />
+            <FaSignOutAlt className="text-base text-lg" />
             <span className="hidden sm:inline">Logout</span>
           </button>
         </div>
