@@ -20,11 +20,11 @@ const PinLogin = ({ onSubmit }) => {
             inputRefs.current[index + 1]?.focus();
         }
 
-        // Login automatically when all 4 digits are filled
         if (newPin.every((digit) => digit !== "")) {
             onSubmit(newPin.join(""));
         }
     };
+
 
     const handleKeyDown = (e, index) => {
         if (e.key === "Backspace" && pin[index] === "" && index > 0) {
@@ -56,18 +56,22 @@ const PinLogin = ({ onSubmit }) => {
                         <motion.input
                             key={index}
                             ref={(el) => (inputRefs.current[index] = el)}
-                            type="password"
+                            type="text" // use text, not password
                             inputMode="numeric"
                             maxLength={1}
-                            value={digit}
+                            value={digit ? "•" : ""}
                             onChange={(e) => handleChange(index, e.target.value)}
                             onKeyDown={(e) => handleKeyDown(e, index)}
                             autoComplete="off"
                             autoCorrect="off"
                             spellCheck="false"
                             className="w-12 h-12 sm:w-14 sm:h-14 text-2xl text-center border border-gray-300 rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-crimson-700 transition"
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.3 + index * 0.1, type: "spring", stiffness: 300 }}
                         />
                     ))}
+
                 </div>
             </motion.div>
         </div>
