@@ -11,7 +11,7 @@ import EditPolicyModal from "./components/EditPolicyModal";
 import PinLogin from "./components/PinLogin";
 import { motion, AnimatePresence } from "framer-motion";
 
-const CORRECT_PIN = "1975"; // Replace with your actual PIN
+const CORRECT_PIN = "2121"; // Replace with your actual PIN
 
 function App() {
   const [policies, setPolicies] = useState([]);
