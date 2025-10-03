@@ -40,7 +40,7 @@ const Summary = ({ policies, issuedPolicies, totalFYFRP, totalWFYFRP }) => {
       transition={{ duration: 0.4 }}
       className="w-full mx-auto mt-6 mb-12 px-4 sm:px-6 md:px-0"
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-10 px-2 sm:px-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2 px-2 sm:px-4">
         {cards.map(({ title, value, icon }, i) => (
           <motion.div
             key={i}
