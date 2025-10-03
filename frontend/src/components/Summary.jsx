@@ -4,16 +4,22 @@ import {
   FaFileAlt,
   FaMoneyCheckAlt,
   FaChartLine,
+  FaCheckCircle,
 } from "react-icons/fa";
 
-const Summary = ({ policies, totalFYFRP, totalWFYFRP }) => {
+const Summary = ({ policies, issuedPolicies, totalFYFRP, totalWFYFRP }) => {
   const total = policies.length;
 
   const cards = [
     {
-      title: "No. of Policies",
+      title: "Total Policies",
       value: total,
       icon: <FaFileAlt className="text-crimson-700 text-2xl" />,
+    },
+    {
+      title: "Issued Policies",
+      value: issuedPolicies,
+      icon: <FaCheckCircle className="text-crimson-700 text-2xl" />,
     },
     {
       title: "Total FYFRP",
@@ -34,7 +40,7 @@ const Summary = ({ policies, totalFYFRP, totalWFYFRP }) => {
       transition={{ duration: 0.4 }}
       className="w-full mx-auto mt-6 mb-12 px-4 sm:px-6 md:px-0"
     >
-      <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-10 px-2 sm:px-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-10 px-2 sm:px-4">
         {cards.map(({ title, value, icon }, i) => (
           <motion.div
             key={i}

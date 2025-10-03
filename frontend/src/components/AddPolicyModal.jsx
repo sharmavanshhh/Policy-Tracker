@@ -6,25 +6,15 @@ import Select from "react-select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-const initialForm = {
-  applicationNumber: "",
-  policyNumber: "",
-  customerName: "",
-  advisorName: "",
-  fyfrp: "",
-  wfyfrp: "",
-  planName: "",
-  mode: "",
-  loginDate: null,
-  issuedDate: null,
-  status: "",
-};
-
 const modes = ["Yearly", "Half-Yearly", "Quarterly", "Monthly"];
 const statuses = ["Pending", "Rejected", "Issued"];
 
-const AddPolicyModal = ({ onClose, onAdded }) => {
-  const [form, setForm] = useState(initialForm);
+const EditPolicyModal = ({ policy, onClose, onUpdated }) => {
+  const [form, setForm] = useState({
+    ...policy,
+    loginDate: policy.loginDate ? new Date(policy.loginDate) : null,
+    issuedDate: policy.issuedDate ? new Date(policy.issuedDate) : null,
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [isVisible, setIsVisible] = useState(true);
@@ -74,6 +64,27 @@ const AddPolicyModal = ({ onClose, onAdded }) => {
     setTimeout(onClose, 300);
   };
 
+  const DateInputWithIcon = React.forwardRef(({ value, onClick, placeholder }, ref) => (
+    <button
+      type="button"
+      onClick={onClick}
+      ref={ref}
+      className="w-full text-left bg-gray-300 text-gray-800 placeholder-neutral-800 px-3 py-2 pr-10 rounded-md focus:outline-none"
+    >
+      <span className={value ? "" : "text-neutral-800"}>{value || placeholder}</span>
+      <FaRegCalendarAlt className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-700 pointer-events-none" />
+    </button>
+  ));
+
+  // Helper function to format date in local timezone
+  const formatDateLocal = (date) => {
+    if (!date) return null;
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const handleSubmit = async () => {
     const requiredFields = ["applicationNumber", "customerName", "advisorName", "planName", "mode", "status"];
     if (isIssued) requiredFields.push("issuedDate");
@@ -99,24 +110,20 @@ const AddPolicyModal = ({ onClose, onAdded }) => {
 
     const payload = {
       ...form,
-      loginDate: form.loginDate ? form.loginDate.toISOString().split("T")[0] : null,
-      issuedDate: isIssued ? form.issuedDate?.toISOString().split("T")[0] : "",
+      loginDate: formatDateLocal(form.loginDate),
+      issuedDate: isIssued && form.issuedDate ? formatDateLocal(form.issuedDate) : "",
       fyfrp: parseInt(form.fyfrp || 0),
       wfyfrp: parseInt(form.wfyfrp || 0),
     };
 
     try {
       setLoading(true);
-      await axios.post("https://policy-tracker-o1bg.onrender.com/api/policies", payload);
-      onAdded();
+      await axios.put(`https://policy-tracker-o1bg.onrender.com/api/policies/${form.applicationNumber}`, payload);
+      onUpdated();
       handleClose();
     } catch (err) {
       console.error(err);
-      if (err.response?.data?.error?.toLowerCase().includes("application")) {
-        setError("Application Number already exists. Please enter a unique one.");
-      } else {
-        setError("Failed to add policy. Please try again later.");
-      }
+      setError("Failed to update policy.");
     } finally {
       setLoading(false);
     }
@@ -156,18 +163,6 @@ const AddPolicyModal = ({ onClose, onAdded }) => {
     placeholder: (base) => ({ ...base, color: "#1f2937" }),
   };
 
-  const DateInputWithIcon = React.forwardRef(({ value, onClick, placeholder }, ref) => (
-    <button
-      type="button"
-      onClick={onClick}
-      ref={ref}
-      className="w-full text-left bg-gray-300 text-gray-800 placeholder-neutral-800 px-3 py-2 pr-10 rounded-md focus:outline-none"
-    >
-      <span className={value ? "" : "text-neutral-800"}>{value || placeholder}</span>
-      <FaRegCalendarAlt className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-700 pointer-events-none" />
-    </button>
-  ));
-
   return (
     <AnimatePresence>
       {isVisible && (
@@ -187,14 +182,14 @@ const AddPolicyModal = ({ onClose, onAdded }) => {
             className="fixed inset-x-0 bottom-0 z-50 bg-white/90 backdrop-blur border-t border-gray-300 rounded-t-2xl shadow-xl p-6 max-h-[90vh] overflow-y-auto mx-auto w-full max-w-4xl"
           >
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-crimson-700">Add New Policy</h2>
+              <h2 className="text-xl font-bold text-crimson-700">Edit Policy</h2>
               <button onClick={handleClose} className="text-gray-500 hover:text-red-600">
                 <FaTimes />
               </button>
             </div>
 
             {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-sm flex justify-between sticky top-0 z-10">
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-sm flex justify-between sticky top-0 z-50">
                 <span>{error}</span>
                 <button onClick={() => setError("")} className="text-red-600 hover:text-red-800">
                   <FaTimes />
@@ -205,7 +200,7 @@ const AddPolicyModal = ({ onClose, onAdded }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {[
                 { label: "Application Number", name: "applicationNumber", required: true },
-                { label: "Policy Number", name: "policyNumber", type: "number" },
+                { label: "Policy Number", name: "policyNumber" },
                 { label: "Customer Name", name: "customerName", required: true },
                 { label: "Advisor Name", name: "advisorName", required: true },
                 { label: "FYFRP", name: "fyfrp", type: "number" },
@@ -221,13 +216,13 @@ const AddPolicyModal = ({ onClose, onAdded }) => {
                     value={form[name]}
                     onChange={handleChange}
                     type={type}
-                    autoComplete="off"
+                    menuPlacement="auto"
                     className="bg-gray-300 text-gray-800 px-3 py-2 rounded-md focus:outline-none"
                   />
                 </div>
               ))}
 
-              {/* Login Date */}
+              {/* Login Date - React DatePicker with custom input */}
               <div className="flex flex-col relative">
                 <label className="text-sm font-medium text-gray-700 mb-1">Login Date</label>
                 <DatePicker
@@ -241,7 +236,8 @@ const AddPolicyModal = ({ onClose, onAdded }) => {
                 />
               </div>
 
-              {/* Mode */}
+
+              {/* Mode - React Select */}
               <div className="flex flex-col">
                 <label className="text-sm font-medium text-gray-700 mb-1">Mode <span className="text-red-500">*</span></label>
                 <Select
@@ -256,7 +252,7 @@ const AddPolicyModal = ({ onClose, onAdded }) => {
                 />
               </div>
 
-              {/* Status */}
+              {/* Status - React Select */}
               <div className="flex flex-col">
                 <label className="text-sm font-medium text-gray-700 mb-1">Status <span className="text-red-500">*</span></label>
                 <Select
@@ -274,21 +270,24 @@ const AddPolicyModal = ({ onClose, onAdded }) => {
               {/* Issued Date */}
               {isIssued && (
                 <div className="flex flex-col sm:col-span-2 relative">
-                  <label className="text-sm font-medium text-gray-700 mb-1">Issued Date <span className="text-red-500">*</span></label>
+                  <label className="text-sm font-medium text-gray-700 mb-1">
+                    Issued Date <span className="text-red-500">*</span>
+                  </label>
                   <DatePicker
                     selected={form.issuedDate}
                     onChange={(date) => handleDateChange(date, "issuedDate")}
                     dateFormat="yyyy-MM-dd"
                     maxDate={today}
                     placeholderText="Select Issued Date"
-                    customInput={<DateInputWithIcon />}
                     popperPlacement="top-end"
+                    customInput={<DateInputWithIcon />}
                   />
                 </div>
               )}
+
             </div>
 
-            <div className="mt-8 flex justify-end gap-4">
+            <div className="flex flex-col sm:flex-row justify-end mt-6 gap-3">
               <button
                 onClick={handleClose}
                 className="px-5 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-full text-sm font-medium shadow"
@@ -300,7 +299,7 @@ const AddPolicyModal = ({ onClose, onAdded }) => {
                 disabled={loading}
                 className="px-5 py-2 bg-crimson-700 hover:bg-crimson-800 text-white rounded-full text-sm font-medium shadow"
               >
-                {loading ? "Adding..." : "Add Policy"}
+                {loading ? "Saving..." : "Update Policy"}
               </button>
             </div>
           </motion.div>
@@ -310,4 +309,4 @@ const AddPolicyModal = ({ onClose, onAdded }) => {
   );
 };
 
-export default AddPolicyModal;
+export default EditPolicyModal;

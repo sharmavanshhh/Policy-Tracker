@@ -4,10 +4,11 @@ import {
   FaFileAlt,
   FaMoneyCheckAlt,
   FaChartLine,
+  FaCheckCircle,
   FaArrowRight,
 } from "react-icons/fa";
 
-const Dashboard = ({ totalPolicies, totalFYFRP, totalWFYFRP, onViewDetails }) => {
+const Dashboard = ({ totalPolicies, issuedPolicies, totalFYFRP, totalWFYFRP, onViewDetails }) => {
   return (
     <div className="text-gray-900 font-sans flex items-center justify-center px-4 sm:px-6">
       <div className="w-full max-w-7xl text-center py-12 sm:py-16 px-4 sm:px-6">
@@ -22,16 +23,21 @@ const Dashboard = ({ totalPolicies, totalFYFRP, totalWFYFRP, onViewDetails }) =>
         </motion.h1>
 
         <p className="text-gray-600 text-sm sm:text-base mb-12 sm:mb-16">
-          {/* Here’s a quick overview of your policy data */}
+          {/* Here's a quick overview of your policy data */}
         </p>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-10 px-2 sm:px-4">
+        <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-10 px-2 sm:px-4">
           {[
             {
               title: "Total Policies",
               value: totalPolicies,
               icon: <FaFileAlt />,
+            },
+            {
+              title: "Issued Policies",
+              value: issuedPolicies,
+              icon: <FaCheckCircle />,
             },
             {
               title: "Total FYFRP",

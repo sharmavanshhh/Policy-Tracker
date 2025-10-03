@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FaPlus, FaArrowLeft, FaFilter, FaSignOutAlt } from "react-icons/fa";
+import { FaPlus, FaArrowLeft, FaFilter, FaSignOutAlt, FaTrashAlt, FaKey } from "react-icons/fa";
 import Dashboard from "./components/Dashboard";
 import Filters from "./components/Filters";
 import PolicyTable from "./components/PolicyTable";
@@ -9,11 +9,16 @@ import AddPolicyModal from "./components/AddPolicyModal";
 import MessageModal from "./components/MessageModal";
 import EditPolicyModal from "./components/EditPolicyModal";
 import PinLogin from "./components/PinLogin";
+import DeleteAllModal from "./components/DeleteAllModal";
+import ChangePinModal from "./components/ChangePinModal";
 import { motion, AnimatePresence } from "framer-motion";
 
-const CORRECT_PIN = "2121"; // Replace with your actual PIN
-
 function App() {
+  // Load PIN from localStorage or use default
+  const [currentPin, setCurrentPin] = useState(
+    localStorage.getItem("appPin") || "2121"
+  );
+
   const [policies, setPolicies] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [filters, setFilters] = useState({});
@@ -24,8 +29,8 @@ function App() {
   const [pinInput, setPinInput] = useState("");
   const [authenticated, setIsAuthenticated] = useState(false);
   const [showPinErrorModal, setShowPinErrorModal] = useState(false);
-
-
+  const [showDeleteAllModal, setShowDeleteAllModal] = useState(false);
+  const [showChangePinModal, setShowChangePinModal] = useState(false);
 
   const fetchPolicies = () => {
     axios
@@ -42,15 +47,38 @@ function App() {
   }, []);
 
   const handlePinSubmit = (pin) => {
-    if (pin === CORRECT_PIN) {
+    if (pin === currentPin) {
       setIsAuthenticated(true);
       setViewMode("dashboard");
     } else {
-      setShowPinErrorModal(true); // show modal
+      setShowPinErrorModal(true);
     }
   };
 
+  const handleChangePinSubmit = (newPin) => {
+    setCurrentPin(newPin);
+    localStorage.setItem("appPin", newPin);
+    alert("PIN changed successfully!");
+  };
 
+  const handleDeleteAll = async () => {
+    try {
+      const deletePromises = policies.map((p) =>
+        axios.delete(
+          `https://policy-tracker-o1bg.onrender.com/api/policies/${p.applicationNumber}`
+        )
+      );
+      await Promise.all(deletePromises);
+
+      setPolicies([]);
+      setFiltered([]);
+      setShowDeleteAllModal(false);
+      alert("All policies deleted successfully!");
+    } catch (err) {
+      console.error("Failed to delete all policies", err);
+      alert("Failed to delete some policies. Please try again.");
+    }
+  };
 
   const handleFilterChange = ({ mode, advisor, month, search }) => {
     let data = [...policies];
@@ -95,11 +123,12 @@ function App() {
       data = data.filter(
         (p) =>
           p.customerName.toLowerCase().includes(lower) ||
-          (p.policyNumber && p.policyNumber.toString().toLowerCase().includes(lower)) ||
-          (p.applicationNumber && p.applicationNumber.toString().toLowerCase().includes(lower))
+          (p.policyNumber &&
+            p.policyNumber.toString().toLowerCase().includes(lower)) ||
+          (p.applicationNumber &&
+            p.applicationNumber.toString().toLowerCase().includes(lower))
       );
     }
-
 
     const unique = {};
     data.forEach((p) => {
@@ -111,8 +140,12 @@ function App() {
   };
 
   const handleDeletePolicy = (applicationNumber) => {
-    setPolicies((prev) => prev.filter((p) => p.applicationNumber !== applicationNumber));
-    setFiltered((prev) => prev.filter((p) => p.applicationNumber !== applicationNumber));
+    setPolicies((prev) =>
+      prev.filter((p) => p.applicationNumber !== applicationNumber)
+    );
+    setFiltered((prev) =>
+      prev.filter((p) => p.applicationNumber !== applicationNumber)
+    );
   };
 
   const handleEditPolicy = (policyObj) => {
@@ -121,34 +154,44 @@ function App() {
 
   const calculateTotal = (data, field) => {
     const now = new Date();
-    const currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const currentDate = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
 
     return data.reduce((total, p) => {
       if (!p.issuedDate) return total;
 
       const issued = new Date(p.issuedDate);
-      const issuedDate = new Date(issued.getFullYear(), issued.getMonth(), issued.getDate());
-      if (currentDate < issuedDate) return total; // Not started yet
+      const issuedDate = new Date(
+        issued.getFullYear(),
+        issued.getMonth(),
+        issued.getDate()
+      );
+      if (currentDate < issuedDate) return total;
 
-      const diffMonths = (now.getFullYear() - issued.getFullYear()) * 12 + (now.getMonth() - issued.getMonth());
+      const diffMonths =
+        (now.getFullYear() - issued.getFullYear()) * 12 +
+        (now.getMonth() - issued.getMonth());
       const dayPassed = now.getDate() >= issued.getDate();
 
       let factor = 0;
       switch (p.mode) {
         case "Monthly":
-          factor = diffMonths + (dayPassed ? 1 : 0); // +1 to include current month
+          factor = diffMonths + (dayPassed ? 1 : 0);
           break;
 
         case "Quarterly":
           factor = Math.floor((diffMonths + (dayPassed ? 1 : 0)) / 3) + 1;
-          factor = Math.min(factor, 4); // Max 4 per year
+          factor = Math.min(factor, 4);
           break;
-
 
         case "Half-Yearly":
           factor = Math.floor((diffMonths + (dayPassed ? 1 : 0)) / 6) + 1;
-          factor = Math.min(factor, 2); // Max 2 in a year
+          factor = Math.min(factor, 2);
           break;
+
         case "Yearly":
           factor = diffMonths >= 12 || (diffMonths === 11 && dayPassed) ? 2 : 1;
           break;
@@ -161,10 +204,8 @@ function App() {
     }, 0);
   };
 
-
-
   const getMonthWiseTotal = (data, field, monthFilter) => {
-    const selectedMonth = parseInt(monthFilter); // 1-12
+    const selectedMonth = parseInt(monthFilter);
     const selectedYear = new Date().getFullYear();
     const today = new Date();
 
@@ -177,7 +218,12 @@ function App() {
       const issuedDay = issued.getDate();
 
       const filterDate = new Date(selectedYear, selectedMonth - 1, issuedDay);
-      if (today < filterDate || (issuedYear > selectedYear) || (issuedYear === selectedYear && issuedMonth > selectedMonth)) return total;
+      if (
+        today < filterDate ||
+        issuedYear > selectedYear ||
+        (issuedYear === selectedYear && issuedMonth > selectedMonth)
+      )
+        return total;
 
       const monthsSince =
         (selectedYear - issuedYear) * 12 + (selectedMonth - issuedMonth);
@@ -187,7 +233,7 @@ function App() {
           return monthsSince < 12 ? total + (parseInt(p[field]) || 0) : total;
 
         case "Quarterly":
-          return ([0, 3, 6, 9].includes(monthsSince))
+          return [0, 3, 6, 9].includes(monthsSince)
             ? total + (parseInt(p[field]) || 0)
             : total;
 
@@ -198,17 +244,20 @@ function App() {
 
         case "Yearly": {
           if (selectedMonth === issuedMonth) {
-            const issuedDateThisYear = new Date(selectedYear, issued.getMonth(), issuedDay);
-            const issuedDateNextYear = new Date(issuedYear + 1, issued.getMonth(), issuedDay);
+            const issuedDateThisYear = new Date(
+              selectedYear,
+              issued.getMonth(),
+              issuedDay
+            );
+            const issuedDateNextYear = new Date(
+              issuedYear + 1,
+              issued.getMonth(),
+              issuedDay
+            );
             let yearlyTotal = 0;
-            // First year installment
-            if (
-              selectedYear === issuedYear &&
-              today >= issuedDateThisYear
-            ) {
+            if (selectedYear === issuedYear && today >= issuedDateThisYear) {
               yearlyTotal += parseInt(p[field]) || 0;
             }
-            // Second year installment (recurring)
             if (
               selectedYear === issuedYear + 1 &&
               today >= issuedDateNextYear
@@ -225,21 +274,25 @@ function App() {
     }, 0);
   };
 
+  const countIssuedPolicies = (data) => {
+    return data.filter((p) => p.status?.toLowerCase() === "issued").length;
+  };
 
-  const noFilters = !filters.mode && !filters.advisor && !filters.month && !filters.search;
+  const noFilters =
+    !filters.mode && !filters.advisor && !filters.month && !filters.search;
   const isMonthFilter = !!filters.month;
 
   const totalFYFRP = isMonthFilter
     ? getMonthWiseTotal(filtered, "fyfrp", filters.month)
     : noFilters
-      ? calculateTotal(policies, "fyfrp")
-      : calculateTotal(filtered, "fyfrp");
+    ? calculateTotal(policies, "fyfrp")
+    : calculateTotal(filtered, "fyfrp");
 
   const totalWFYFRP = isMonthFilter
     ? getMonthWiseTotal(filtered, "wfyfrp", filters.month)
     : noFilters
-      ? calculateTotal(policies, "wfyfrp")
-      : calculateTotal(filtered, "wfyfrp");
+    ? calculateTotal(policies, "wfyfrp")
+    : calculateTotal(filtered, "wfyfrp");
 
   const toggleView = () => {
     setViewMode((prev) => (prev === "dashboard" ? "detailed" : "dashboard"));
@@ -247,16 +300,20 @@ function App() {
 
   const handleLogout = () => {
     setIsAuthenticated(false);
-    setPinInput(""); // Optional: reset PIN input
-    setViewMode("dashboard"); // Reset to dashboard on logout
+    setPinInput("");
+    setViewMode("dashboard");
   };
 
-  const activeFilterCount = Object.values(filters).filter((v) => v !== "").length;
+  const activeFilterCount = Object.values(filters).filter((v) => v !== "")
+    .length;
 
   if (!authenticated) {
     return (
       <div className="h-screen w-screen fixed inset-0 flex items-center justify-center bg-gradient-to-br from-gray-200 via-silver to-gray-100">
-        <PinLogin onSubmit={handlePinSubmit} resetTrigger={showPinErrorModal} />
+        <PinLogin
+          onSubmit={handlePinSubmit}
+          resetTrigger={showPinErrorModal}
+        />
         {showPinErrorModal && (
           <MessageModal
             title="Incorrect PIN"
@@ -266,20 +323,25 @@ function App() {
               if (e.key === "Enter") {
                 setShowPinErrorModal(false);
               }
-            }
-          }
+            }}
           />
         )}
       </div>
     );
   }
 
-
-
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-gray-200 via-silver to-gray-100 text-gray-900 font-sans px-2 sm:px-4 md:px-6 py-6 sm:py-10 mx-auto">
       {viewMode === "dashboard" && (
-        <div className="w-full flex justify-end mb-4 mt-2 mr-2 px-2 sm:px-4">
+        <div className="w-full flex justify-end gap-4 mb-4 mt-2 mr-2 px-2 sm:px-4">
+          <button
+            onClick={() => setShowChangePinModal(true)}
+            className="flex items-center gap-2 text-crimson-800 hover:text-crimson-900 font-medium text-sm sm:text-base transition"
+            title="Change PIN"
+          >
+            <FaKey className="text-base text-lg" />
+            <span className="hidden sm:inline">Change PIN</span>
+          </button>
           <button
             onClick={handleLogout}
             className="flex items-center gap-2 text-crimson-800 hover:text-crimson-900 font-medium text-sm sm:text-base transition"
@@ -291,10 +353,10 @@ function App() {
         </div>
       )}
 
-
       {viewMode === "dashboard" && (
         <Dashboard
           totalPolicies={policies.length}
+          issuedPolicies={countIssuedPolicies(policies)}
           totalFYFRP={calculateTotal(policies, "fyfrp")}
           totalWFYFRP={calculateTotal(policies, "wfyfrp")}
           onViewDetails={toggleView}
@@ -303,21 +365,36 @@ function App() {
 
       {viewMode === "detailed" && (
         <div className="w-full max-w-7xl mx-auto">
-          {/* Header */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="flex justify-between items-center gap-4 mb-10"
           >
-            {/* Title */}
             <h2 className="text-2xl sm:text-4xl font-bold text-crimson-800 tracking-tight flex items-center gap-3 ml-4 sm:ml-0">
               Detailed Policy Data
-
             </h2>
 
-            {/* Back Button (right) */}
-            <div className="flex items-center">
-              {/* Mobile: circular button */}
+            <div className="flex items-center gap-2">
+              {/* Delete All Button - Desktop */}
+              <button
+                onClick={() => setShowDeleteAllModal(true)}
+                className="hidden sm:inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-sm rounded-md font-medium shadow-md transition"
+                title="Delete All Policies"
+              >
+                <FaTrashAlt className="text-sm" /> Delete All
+              </button>
+
+              {/* Delete All Button - Mobile */}
+              <button
+                onClick={() => setShowDeleteAllModal(true)}
+                className="inline-flex sm:hidden items-center justify-center bg-red-600 hover:bg-red-700 text-white w-9 h-9 rounded-full shadow-md transition"
+                aria-label="Delete All"
+                title="Delete All Policies"
+              >
+                <FaTrashAlt className="text-sm" />
+              </button>
+
+              {/* Back Button - Mobile */}
               <button
                 onClick={toggleView}
                 className="inline-flex sm:hidden items-center justify-center bg-gradient-to-r from-crimson-700 to-gray-800 text-white w-9 h-9 rounded-full shadow-md hover:bg-crimson-800 transition mr-2"
@@ -326,7 +403,7 @@ function App() {
                 <FaArrowLeft className="text-base" />
               </button>
 
-              {/* Desktop Back Button */}
+              {/* Back Button - Desktop */}
               <button
                 onClick={toggleView}
                 className="hidden sm:inline-flex items-center gap-2 bg-gradient-to-r from-crimson-700 to-gray-800 text-white px-5 sm:px-8 py-3 text-sm sm:text-base rounded-md font-medium shadow-md transition"
@@ -336,9 +413,6 @@ function App() {
             </div>
           </motion.div>
 
-
-
-          {/* Filters */}
           <Filters
             policies={policies}
             onFilterChange={handleFilterChange}
@@ -346,17 +420,16 @@ function App() {
             setShowModal={setShowFilterModal}
           />
 
-          {/* Summary */}
           <div className="mb-10">
             <Summary
               policies={filtered}
+              issuedPolicies={countIssuedPolicies(filtered)}
               totalPolicies={filtered.length}
               totalFYFRP={totalFYFRP}
               totalWFYFRP={totalWFYFRP}
             />
           </div>
 
-          {/* Table */}
           <div className="mb-20">
             <PolicyTable
               policies={filtered}
@@ -365,7 +438,6 @@ function App() {
             />
           </div>
 
-          {/* Floating Filter Button with Active Badge */}
           <div className="fixed bottom-6 left-4 sm:bottom-8 sm:left-8 z-50">
             <button
               onClick={() => setShowFilterModal(true)}
@@ -374,7 +446,6 @@ function App() {
             >
               <FaFilter />
 
-              {/* Show badge only if any filters are active */}
               {activeFilterCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-white text-crimson-800 text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow">
                   {activeFilterCount > 9 ? "9+" : activeFilterCount}
@@ -383,8 +454,6 @@ function App() {
             </button>
           </div>
 
-
-          {/* Floating Add Button (Right) */}
           <button
             onClick={() => setShowAddModal(true)}
             className="fixed bottom-6 right-4 sm:bottom-8 sm:right-8 bg-gradient-to-r from-crimson-700 to-gray-800 text-white w-12 h-12 sm:w-14 sm:h-14 rounded-full shadow-xl flex items-center justify-center text-xl sm:text-2xl transition"
@@ -393,15 +462,35 @@ function App() {
             <FaPlus />
           </button>
 
-
-          {/* Modals */}
           {showAddModal && (
-            <AddPolicyModal onClose={() => setShowAddModal(false)} onAdded={fetchPolicies} />
+            <AddPolicyModal
+              onClose={() => setShowAddModal(false)}
+              onAdded={fetchPolicies}
+            />
           )}
           {editPolicy && (
-            <EditPolicyModal policy={editPolicy} onClose={() => setEditPolicy(null)} onUpdated={fetchPolicies} />
+            <EditPolicyModal
+              policy={editPolicy}
+              onClose={() => setEditPolicy(null)}
+              onUpdated={fetchPolicies}
+            />
+          )}
+          {showDeleteAllModal && (
+            <DeleteAllModal
+              onClose={() => setShowDeleteAllModal(false)}
+              onConfirm={handleDeleteAll}
+              policyCount={policies.length}
+            />
           )}
         </div>
+      )}
+
+      {showChangePinModal && (
+        <ChangePinModal
+          onClose={() => setShowChangePinModal(false)}
+          onSubmit={handleChangePinSubmit}
+          currentPin={currentPin}
+        />
       )}
     </div>
   );
