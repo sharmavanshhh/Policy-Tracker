@@ -55,7 +55,7 @@ const Summary = ({ policies, issuedPolicies, totalFYFRP, totalWFYFRP }) => {
               </p>
               <div>{icon}</div>
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 break-words">
+            <h2 className="text-3xl sm:text-3xl md:text-3xl font-bold text-gray-900 break-words">
               {value}
             </h2>
           </motion.div>
