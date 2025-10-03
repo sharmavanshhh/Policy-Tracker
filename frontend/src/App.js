@@ -376,23 +376,23 @@ function App() {
 
             <div className="flex items-center gap-2">
               {/* Delete All Button - Desktop */}
-              <button
+              {/* <button
                 onClick={() => setShowDeleteAllModal(true)}
                 className="hidden sm:inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-sm rounded-md font-medium shadow-md transition"
                 title="Delete All Policies"
               >
                 <FaTrashAlt className="text-sm" /> Delete All
-              </button>
+              </button> */}
 
               {/* Delete All Button - Mobile */}
-              <button
+              {/* <button
                 onClick={() => setShowDeleteAllModal(true)}
                 className="inline-flex sm:hidden items-center justify-center bg-red-600 hover:bg-red-700 text-white w-9 h-9 rounded-full shadow-md transition"
                 aria-label="Delete All"
                 title="Delete All Policies"
               >
                 <FaTrashAlt className="text-sm" />
-              </button>
+              </button> */}
 
               {/* Back Button - Mobile */}
               <button
